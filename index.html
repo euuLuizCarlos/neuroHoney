@@ -84,7 +84,7 @@
       width: 100%;
       border-radius: 16px;
       overflow: hidden;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
       border: 1px solid var(--border-color);
       background-color: var(--bg-card);
@@ -97,10 +97,36 @@
       object-fit: cover;
     }
 
+    /* Botão de Download do App em Destaque */
+    .download-app-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #000000;
+      font-weight: 800;
+      font-size: 1.05rem;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      margin-bottom: 24px;
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+      transition: transform 0.15s ease, filter 0.15s ease;
+      text-transform: uppercase;
+    }
+
+    .download-app-btn:active {
+      transform: scale(0.97);
+      filter: brightness(0.9);
+    }
+
     /* Seções */
     .section-header {
       margin-bottom: 12px;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
     .section-title {
@@ -327,7 +353,7 @@
   <!-- Topo -->
   <header>
     <div class="brand">
-      <span>NH</span> / NeuroHoney App
+      <span>LCO</span> / NeuroHoney App
     </div>
   </header>
 
@@ -338,6 +364,11 @@
     <div class="banner-container">
       <img src="assets/images/banner-neurohoney.jpeg" alt="Bienvenida - Protocolo Neurohoney" class="banner-img" />
     </div>
+
+    <!-- BOTÃO DE DOWNLOAD DO APP (EXIBIDO NA TELA PRINCIPAL) -->
+    <button class="download-app-btn" onclick="openPwaModalManual()">
+      📲 Descargar / Instalar App en mi Teléfono
+    </button>
 
     <!-- SEÇÃO DE MÓDULOS E BÔNUS -->
     <div class="section-header">
@@ -404,7 +435,7 @@
     </div>
   </main>
 
-  <!-- OVERLAY / POP-UP AUTOMÁTICO DE INSTALACIÓN PWA -->
+  <!-- OVERLAY / POP-UP AUTOMÁTICO E MANUAL DE INSTALAÇÃO PWA -->
   <div id="pwaOverlay" class="pwa-overlay">
     <div class="pwa-modal">
       <img src="/icon-192.png" alt="App Icon" class="pwa-icon" />
@@ -428,11 +459,11 @@
         <button onclick="closePWA()" class="pwa-btn">¡ENTENDIDO, YA LO HICE!</button>
       </div>
 
-      <button onclick="closePWA()" class="pwa-close">Continuar desde el navegador web</button>
+      <button onclick="closePWA()" class="pwa-close">Cerrar ventana</button>
     </div>
   </div>
 
-  <!-- SCRIPT PWA OPTIMIZADO -->
+  <!-- SCRIPT PWA OTIMIZADO -->
   <script>
     // Registrar Service Worker
     if ('serviceWorker' in navigator) {
@@ -452,10 +483,8 @@
     const isIOS = /iphone|ipad|ipod/.test(userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-    // Abrir Modal de forma automática al cargar si NO está instalado
+    // Função para abrir o modal de acordo com o dispositivo
     function triggerPwaModal() {
-      if (isStandalone) return;
-
       overlay.classList.add('active');
 
       if (isIOS) {
@@ -467,19 +496,25 @@
       }
     }
 
-    // Capturar evento de instalación de Android/Chrome
+    // Função chamada pelo botão manual na página
+    function openPwaModalManual() {
+      triggerPwaModal();
+    }
+
+    // Capturar evento de instalação de Android/Chrome automaticamente
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      triggerPwaModal();
     });
 
-    // Disparar inmediatamente al cargar la página
+    // Disparar automaticamente no primeiro acesso se não estiver instalado
     window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(triggerPwaModal, 600);
+      if (!isStandalone) {
+        setTimeout(triggerPwaModal, 800);
+      }
     });
 
-    // Acción del Botón de Instalación en Android
+    // Ação do Botón de Instalación em Android (dentro do modal)
     if (installBtn) {
       installBtn.addEventListener('click', async () => {
         if (deferredPrompt) {
